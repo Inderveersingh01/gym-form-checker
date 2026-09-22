@@ -130,6 +130,36 @@
           </div>
         </div>
 
+        <!-- Video Minimizer Card (Shown when video is > 15MB or requested) -->
+        <div id="minimizer-card" class="hidden bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 space-y-3">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+              <div class="w-10 h-10 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-lg shrink-0">
+                <i class="fa-solid fa-compress"></i>
+              </div>
+              <div>
+                <h4 class="text-xs font-bold text-white uppercase tracking-wider">Video Minimizer</h4>
+                <p class="text-xs text-zinc-400" id="minimizer-desc">Your video exceeds 15 MB. Click below to minimize it to ~4 MB for fast analysis.</p>
+              </div>
+            </div>
+            <button id="btn-start-minimize" onclick="runVideoMinimizer()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-bold text-xs transition flex items-center space-x-1.5 shadow-md self-start sm:self-auto shrink-0">
+              <i class="fa-solid fa-bolt"></i>
+              <span>Minimize Video Now</span>
+            </button>
+          </div>
+
+          <!-- Minimizer Progress Bar -->
+          <div id="minimizer-progress-container" class="hidden space-y-1.5 pt-2 border-t border-amber-500/20">
+            <div class="flex justify-between text-[11px] font-semibold text-zinc-300">
+              <span id="minimizer-status-text">Compressing video frames to 640p...</span>
+              <span id="minimizer-pct-text" class="text-amber-400 font-mono">0%</span>
+            </div>
+            <div class="w-full bg-zinc-950 h-2 rounded-full overflow-hidden border border-zinc-800">
+              <div id="minimizer-progress-bar" class="bg-gradient-to-r from-amber-500 to-emerald-400 h-full w-0 transition-all duration-150 rounded-full"></div>
+            </div>
+          </div>
+        </div>
+
         <!-- Immediate Video Preview Container (Appears after uploading) -->
         <div id="preview-container" class="hidden bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 space-y-3">
           <div class="flex items-center justify-between">
@@ -544,31 +574,193 @@
     const MAX_VIDEO_SIZE_MB = 15;
     const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
 
-    // Handles user video selection and IMMEDIATELY plays the video preview!
+    // Handles user video selection with intelligent Video Minimizer prompt
     function handleFileSelected(files) {
       if (files && files[0]) {
         const file = files[0];
         const sizeMb = file.size / (1024 * 1024);
+        selectedFile = file;
+
+        const minimizerCard = document.getElementById('minimizer-card');
+        const previewContainer = document.getElementById('preview-container');
+        const btnAnalyze = document.getElementById('btn-analyze');
 
         if (file.size > MAX_VIDEO_SIZE_BYTES) {
-          alert(`⚠️ Video is too large (${sizeMb.toFixed(1)} MB)!\n\nThe maximum allowed video size is ${MAX_VIDEO_SIZE_MB} MB. Please upload a shorter clip (around 10-20 seconds).`);
-          document.getElementById('video-input').value = "";
-          selectedFile = null;
-          document.getElementById('file-label').innerHTML = 'Click here to choose your video file';
-          document.getElementById('preview-container').classList.add('hidden');
-          return;
-        }
+          // Video exceeds 15 MB -> Prompt user to minimize
+          document.getElementById('file-label').innerHTML = `<span class="text-amber-400 font-bold">${file.name}</span> (${sizeMb.toFixed(1)} MB) — <span class="text-amber-300">Exceeds 15 MB limit</span>`;
+          document.getElementById('minimizer-desc').innerText = `Your video is ${sizeMb.toFixed(1)} MB. Click 'Minimize Video Now' to compress it down to ~4 MB in your browser before analyzing.`;
+          minimizerCard.classList.remove('hidden');
+          previewContainer.classList.add('hidden');
+          btnAnalyze.disabled = true;
+          btnAnalyze.classList.add('opacity-50', 'cursor-not-allowed');
+        } else {
+          // Video is within 15 MB -> Ready to go
+          document.getElementById('file-label').innerHTML = `<span class="text-emerald-400 font-bold">${file.name}</span> selected (${sizeMb.toFixed(1)} MB)`;
+          minimizerCard.classList.add('hidden');
+          btnAnalyze.disabled = false;
+          btnAnalyze.classList.remove('opacity-50', 'cursor-not-allowed');
 
-        selectedFile = file;
-        document.getElementById('file-label').innerHTML = `<span class="text-emerald-400 font-bold">${selectedFile.name}</span> selected (${sizeMb.toFixed(1)} MB)`;
-        
-        // Show video preview immediately on upload screen
-        const previewVideo = document.getElementById('preview-video');
-        const objectUrl = URL.createObjectURL(selectedFile);
-        previewVideo.src = objectUrl;
-        document.getElementById('preview-container').classList.remove('hidden');
-        previewVideo.play().catch(() => {}); // Play or allow user controls
+          // Show video preview immediately
+          const previewVideo = document.getElementById('preview-video');
+          previewVideo.src = URL.createObjectURL(file);
+          previewContainer.classList.remove('hidden');
+          previewVideo.play().catch(() => {});
+        }
       }
+    }
+
+    // High-performance client-side Video Minimizer using HTML5 Canvas & MediaRecorder
+    async function runVideoMinimizer() {
+      if (!selectedFile) return;
+
+      const btn = document.getElementById('btn-start-minimize');
+      const progressContainer = document.getElementById('minimizer-progress-container');
+      const progressBar = document.getElementById('minimizer-progress-bar');
+      const statusText = document.getElementById('minimizer-status-text');
+      const pctText = document.getElementById('minimizer-pct-text');
+      const btnAnalyze = document.getElementById('btn-analyze');
+
+      btn.disabled = true;
+      btn.classList.add('opacity-50');
+      progressContainer.classList.remove('hidden');
+      statusText.innerText = "Minimizing video resolution to 640p...";
+      progressBar.style.width = '5%';
+      pctText.innerText = '5%';
+
+      try {
+        const minimizedFile = await compressVideoInBrowser(selectedFile, (pct) => {
+          progressBar.style.width = `${pct}%`;
+          pctText.innerText = `${pct}%`;
+          statusText.innerText = `Minimizing video... ${pct}%`;
+        });
+
+        const newSizeMb = (minimizedFile.size / (1024 * 1024)).toFixed(1);
+        selectedFile = minimizedFile;
+
+        // Success Feedback
+        statusText.innerText = `✅ Minimized from ${(selectedFile.size / (1024*1024)).toFixed(1)} MB down to ${newSizeMb} MB!`;
+        pctText.innerText = '100%';
+        progressBar.style.width = '100%';
+        document.getElementById('file-label').innerHTML = `<span class="text-emerald-400 font-bold">${minimizedFile.name}</span> (${newSizeMb} MB) — <span class="text-emerald-400 font-bold">Ready!</span>`;
+
+        // Enable Analyze Button
+        btnAnalyze.disabled = false;
+        btnAnalyze.classList.remove('opacity-50', 'cursor-not-allowed');
+
+        // Update preview
+        const previewVideo = document.getElementById('preview-video');
+        previewVideo.src = URL.createObjectURL(minimizedFile);
+        document.getElementById('preview-container').classList.remove('hidden');
+        previewVideo.play().catch(() => {});
+
+        setTimeout(() => {
+          document.getElementById('minimizer-card').classList.add('hidden');
+        }, 2500);
+
+      } catch (err) {
+        console.error("Video minimization error:", err);
+        statusText.innerText = "Notice: " + (err.message || "Minimizer error");
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      }
+    }
+
+    // Pure Browser Canvas + MediaRecorder compression engine
+    function compressVideoInBrowser(file, onProgress) {
+      return new Promise((resolve, reject) => {
+        const video = document.createElement('video');
+        video.src = URL.createObjectURL(file);
+        video.muted = true;
+        video.playsInline = true;
+
+        video.onloadedmetadata = () => {
+          let w = video.videoWidth || 640;
+          let h = video.videoHeight || 480;
+          const maxDim = 640;
+          if (Math.max(w, h) > maxDim) {
+            const scale = maxDim / Math.max(w, h);
+            w = Math.round(w * scale);
+            h = Math.round(h * scale);
+          }
+          w = w - (w % 2);
+          h = h - (h % 2);
+
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+
+          let stream;
+          try {
+            stream = canvas.captureStream ? canvas.captureStream(25) : canvas.mozCaptureStream(25);
+          } catch(e) {
+            return reject(new Error("Browser does not support stream capture."));
+          }
+
+          let mimeType = 'video/webm;codecs=vp8';
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'video/webm';
+            if (!MediaRecorder.isTypeSupported(mimeType)) {
+              mimeType = 'video/mp4';
+            }
+          }
+
+          const options = { videoBitsPerSecond: 1000000 }; // 1.0 Mbps (~7.5 MB per minute)
+          if (mimeType && MediaRecorder.isTypeSupported(mimeType)) options.mimeType = mimeType;
+
+          let recorder;
+          try {
+            recorder = new MediaRecorder(stream, options);
+          } catch(e) {
+            recorder = new MediaRecorder(stream);
+          }
+
+          const chunks = [];
+          recorder.ondataavailable = (e) => {
+            if (e.data && e.data.size > 0) chunks.push(e.data);
+          };
+
+          recorder.onstop = () => {
+            const blob = new Blob(chunks, { type: mimeType || 'video/webm' });
+            const ext = (mimeType && mimeType.includes('mp4')) ? '.mp4' : '.webm';
+            const name = file.name.replace(/\.[^/.]+$/, "") + "_minimized" + ext;
+            const compressedFile = new File([blob], name, { type: blob.type });
+            resolve(compressedFile);
+          };
+
+          recorder.start(100);
+
+          let animId;
+          function draw() {
+            if (!video.paused && !video.ended) {
+              ctx.drawImage(video, 0, 0, w, h);
+              if (onProgress && video.duration > 0) {
+                const pct = Math.min(99, Math.round((video.currentTime / video.duration) * 100));
+                onProgress(pct);
+              }
+              animId = requestAnimationFrame(draw);
+            }
+          }
+
+          video.onplay = () => {
+            animId = requestAnimationFrame(draw);
+          };
+
+          video.onended = () => {
+            cancelAnimationFrame(animId);
+            ctx.drawImage(video, 0, 0, w, h);
+            if (onProgress) onProgress(100);
+            setTimeout(() => {
+              recorder.stop();
+            }, 300);
+          };
+
+          video.onerror = (e) => reject(new Error("Unable to read video frames."));
+          video.play().catch(reject);
+        };
+
+        video.onerror = (e) => reject(new Error("Invalid or unreadable video file."));
+      });
     }
 
     // Toggle between Annotated and Original Video
