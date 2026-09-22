@@ -125,7 +125,7 @@
             </div>
             <div>
               <p class="font-semibold text-sm text-zinc-200" id="file-label">Click here to choose your video file</p>
-              <p class="text-xs text-zinc-500 mt-1">Supports MP4, MOV, or any phone recording (Side view works best)</p>
+              <p class="text-xs text-zinc-500 mt-1">Supports MP4, MOV, or phone videos up to 15 MB (Side view works best)</p>
             </div>
           </div>
         </div>
@@ -541,11 +541,26 @@
       cardEl.classList.add('border-emerald-500', 'bg-emerald-500/10');
     }
 
+    const MAX_VIDEO_SIZE_MB = 15;
+    const MAX_VIDEO_SIZE_BYTES = MAX_VIDEO_SIZE_MB * 1024 * 1024;
+
     // Handles user video selection and IMMEDIATELY plays the video preview!
     function handleFileSelected(files) {
       if (files && files[0]) {
-        selectedFile = files[0];
-        document.getElementById('file-label').innerHTML = `<span class="text-emerald-400 font-bold">${selectedFile.name}</span> selected (${(selectedFile.size / (1024*1024)).toFixed(1)} MB)`;
+        const file = files[0];
+        const sizeMb = file.size / (1024 * 1024);
+
+        if (file.size > MAX_VIDEO_SIZE_BYTES) {
+          alert(`⚠️ Video is too large (${sizeMb.toFixed(1)} MB)!\n\nThe maximum allowed video size is ${MAX_VIDEO_SIZE_MB} MB. Please upload a shorter clip (around 10-20 seconds).`);
+          document.getElementById('video-input').value = "";
+          selectedFile = null;
+          document.getElementById('file-label').innerHTML = 'Click here to choose your video file';
+          document.getElementById('preview-container').classList.add('hidden');
+          return;
+        }
+
+        selectedFile = file;
+        document.getElementById('file-label').innerHTML = `<span class="text-emerald-400 font-bold">${selectedFile.name}</span> selected (${sizeMb.toFixed(1)} MB)`;
         
         // Show video preview immediately on upload screen
         const previewVideo = document.getElementById('preview-video');
@@ -666,6 +681,11 @@
     async function startAnalysis() {
       if (!selectedFile) {
         alert("Please select a workout video first by clicking the upload area.");
+        return;
+      }
+
+      if (selectedFile.size > MAX_VIDEO_SIZE_BYTES) {
+        alert(`⚠️ Video is too large (${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB). Please select a workout video up to ${MAX_VIDEO_SIZE_MB} MB.`);
         return;
       }
 

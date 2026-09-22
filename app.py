@@ -11,8 +11,12 @@ from pipeline import GymFormCheckerPipeline
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = os.path.dirname(os.path.abspath(__file__))
-app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024  # 100 MB max
+app.config["MAX_CONTENT_LENGTH"] = 15 * 1024 * 1024  # 15 MB max
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+@app.errorhandler(413)
+def request_entity_too_large(error):
+    return jsonify({"success": False, "error": "Video file exceeds the 15 MB limit. Please upload a smaller video clip."}), 413
 
 # Initialize pipeline instance (cached in memory)
 pipeline = GymFormCheckerPipeline()
