@@ -608,7 +608,14 @@
 
       try {
         const res = await fetch('/api/analyze', { method: 'POST', body: formData });
-        const json = await res.json();
+        const text = await res.text();
+        let json;
+        try {
+          json = JSON.parse(text);
+        } catch(parseErr) {
+          throw new Error(`Server returned HTTP ${res.status}: ${text.slice(0, 150)}`);
+        }
+
         if (json.success) {
           progressBar.style.width = '100%';
           setTimeout(() => {
@@ -616,11 +623,11 @@
             goToScreen('screen-overview');
           }, 600);
         } else {
-          alert("Analysis error: " + json.error);
+          alert("Analysis error: " + (json.error || "Unknown error"));
           goToScreen('screen-upload');
         }
       } catch (err) {
-        alert("Server error occurred during analysis.");
+        alert("Notice: " + err.message);
         goToScreen('screen-upload');
       }
     }

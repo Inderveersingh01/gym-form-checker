@@ -66,6 +66,13 @@ class VideoAnnotator:
         height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
         video_fps = cap.get(cv2.CAP_PROP_FPS) or self.fps
 
+        needs_resize = False
+        if width > 720:
+            scale = 720.0 / width
+            width = 720
+            height = int(height * scale)
+            needs_resize = True
+
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
         out = cv2.VideoWriter(output_path, fourcc, video_fps, (width, height))
 
@@ -94,6 +101,9 @@ class VideoAnnotator:
             ret, frame = cap.read()
             if not ret:
                 break
+
+            if needs_resize:
+                frame = cv2.resize(frame, (width, height), interpolation=cv2.INTER_AREA)
 
             if max_frames and frame_idx >= max_frames:
                 break
