@@ -56,15 +56,13 @@ def analyze_video():
         results = pipeline.process_video(
             video_path=video_path,
             exercise_override=exercise_override,
-            generate_video=True
+            generate_video=False
         )
-        base_name = os.path.splitext(os.path.basename(video_path))[0]
-        video_filename = f"{base_name}_annotated.mp4"
         orig_filename = os.path.basename(video_path)
         return jsonify({
             "success": True,
             "data": results,
-            "video_url": f"/video/{video_filename}",
+            "video_url": f"/video/{orig_filename}",
             "original_video_url": f"/video/{orig_filename}"
         })
     except Exception as e:

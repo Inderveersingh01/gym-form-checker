@@ -6,7 +6,7 @@ import json
 import sys
 import gc
 
-def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_every_n_frames=3, max_frames=450):
+def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_every_n_frames=4, max_frames=300):
     base_options = python.BaseOptions(model_asset_path=model_path)
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
@@ -29,8 +29,8 @@ def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_ever
 
         if frame_idx % sample_every_n_frames == 0:
             h, w = frame.shape[:2]
-            if max(h, w) > 640:
-                scale = 640.0 / max(h, w)
+            if max(h, w) > 480:
+                scale = 480.0 / max(h, w)
                 frame = cv2.resize(frame, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
 
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)

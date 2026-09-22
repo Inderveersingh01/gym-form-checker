@@ -211,27 +211,26 @@
         <!-- Video Player & Metric Cards Layout -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
-          <!-- Left: Video Player with Toggle for Original vs Annotated (6 Cols) -->
+          <!-- Left: Video Player with Real-Time AI Skeleton Canvas (6 Cols) -->
           <div class="lg:col-span-6 bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden p-4 space-y-3">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold tracking-wider uppercase text-zinc-400 flex items-center space-x-2">
                 <i class="fa-solid fa-circle-play text-emerald-400"></i>
-                <span id="video-title-label">Analyzed Video (With Angles)</span>
+                <span id="video-title-label">Your Workout Video</span>
               </span>
               
               <!-- Video Toggle Button -->
               <div class="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
-                <button id="btn-view-annotated" onclick="switchVideoView('annotated')" class="px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition">
-                  Analyzed
-                </button>
-                <button id="btn-view-original" onclick="switchVideoView('original')" class="px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-400 hover:text-white transition">
-                  Original
+                <button id="btn-toggle-skeleton" onclick="toggleSkeletonOverlay()" class="px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition flex items-center space-x-1">
+                  <i class="fa-solid fa-bone text-[10px]"></i>
+                  <span id="skeleton-toggle-text">AI Skeleton: ON</span>
                 </button>
               </div>
             </div>
 
-            <div class="aspect-video bg-black rounded-xl overflow-hidden border border-zinc-800 relative">
-              <video id="result-video" controls class="w-full h-full object-contain"></video>
+            <div class="aspect-video bg-black rounded-xl overflow-hidden border border-zinc-800 relative flex items-center justify-center">
+              <video id="result-video" playsinline controls class="w-full h-full object-contain"></video>
+              <canvas id="skeleton-canvas" class="absolute inset-0 pointer-events-none w-full h-full"></canvas>
             </div>
 
             <div class="grid grid-cols-3 gap-2 text-center pt-1">
@@ -558,24 +557,109 @@
     }
 
     // Toggle between Annotated and Original Video
-    function switchVideoView(mode) {
-      const v = document.getElementById('result-video');
-      const titleLabel = document.getElementById('video-title-label');
-      const btnAnnotated = document.getElementById('btn-view-annotated');
-      const btnOriginal = document.getElementById('btn-view-original');
+    let isSkeletonOn = true;
+    let skeletonKeypoints = [];
+    let canvasLoopRunning = false;
 
-      if (mode === 'annotated') {
-        v.src = currentAnnotatedVideoUrl;
-        titleLabel.innerText = "Analyzed Video (With Angles)";
-        btnAnnotated.className = "px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition";
-        btnOriginal.className = "px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-400 hover:text-white transition";
+    function toggleSkeletonOverlay() {
+      isSkeletonOn = !isSkeletonOn;
+      const btn = document.getElementById('btn-toggle-skeleton');
+      const text = document.getElementById('skeleton-toggle-text');
+      const canvas = document.getElementById('skeleton-canvas');
+
+      if (isSkeletonOn) {
+        btn.className = "px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition flex items-center space-x-1";
+        text.innerText = "AI Skeleton: ON";
       } else {
-        v.src = currentOriginalVideoUrl;
-        titleLabel.innerText = "Original Video (Your Upload)";
-        btnOriginal.className = "px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition";
-        btnAnnotated.className = "px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-400 hover:text-white transition";
+        btn.className = "px-2.5 py-1 text-[10px] font-bold rounded-md bg-zinc-800 text-zinc-400 hover:text-white transition flex items-center space-x-1";
+        text.innerText = "AI Skeleton: OFF";
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
       }
-      v.play().catch(() => {});
+    }
+
+    // High performance real-time skeleton renderer on Canvas
+    function initSkeletonCanvasRenderer() {
+      if (canvasLoopRunning) return;
+      canvasLoopRunning = true;
+
+      const v = document.getElementById('result-video');
+      const canvas = document.getElementById('skeleton-canvas');
+      if (!v || !canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      function drawFrame() {
+        if (!v.paused && !v.ended && isSkeletonOn && skeletonKeypoints && skeletonKeypoints.length > 0) {
+          const rect = v.getBoundingClientRect();
+          if (canvas.width !== canvas.clientWidth || canvas.height !== canvas.clientHeight) {
+            canvas.width = canvas.clientWidth;
+            canvas.height = canvas.clientHeight;
+          }
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+          // Calculate current video frame index
+          const fps = 30.0;
+          const currentFrame = Math.round(v.currentTime * fps);
+
+          let closest = null;
+          let minDiff = Infinity;
+          for (let i = 0; i < skeletonKeypoints.length; i++) {
+            const diff = Math.abs((skeletonKeypoints[i].frame || 0) - currentFrame);
+            if (diff < minDiff) {
+              minDiff = diff;
+              closest = skeletonKeypoints[i];
+            }
+          }
+
+          if (closest && minDiff <= 20) {
+            const w = canvas.width;
+            const h = canvas.height;
+            const side = globalAnalysisData?.metadata?.dominant_camera_side || 'right';
+
+            const joints = ['shoulder', 'hip', 'knee', 'ankle', 'elbow', 'wrist'];
+            const coords = {};
+            joints.forEach(j => {
+              const pt = closest[`${side}_${j}`] || closest[j];
+              if (pt && pt.x !== undefined && pt.y !== undefined) {
+                coords[j] = { x: pt.x * w, y: pt.y * h };
+              }
+            });
+
+            const connections = [
+              ['shoulder', 'hip'],
+              ['hip', 'knee'],
+              ['knee', 'ankle'],
+              ['shoulder', 'elbow'],
+              ['elbow', 'wrist']
+            ];
+
+            // Draw cyan bones
+            ctx.strokeStyle = '#22d3ee';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            connections.forEach(([j1, j2]) => {
+              if (coords[j1] && coords[j2]) {
+                ctx.beginPath();
+                ctx.moveTo(coords[j1].x, coords[j1].y);
+                ctx.lineTo(coords[j2].x, coords[j2].y);
+                ctx.stroke();
+              }
+            });
+
+            // Draw neon green joints
+            ctx.fillStyle = '#4ade80';
+            Object.values(coords).forEach(pt => {
+              ctx.beginPath();
+              ctx.arc(pt.x, pt.y, 5, 0, 2 * Math.PI);
+              ctx.fill();
+            });
+          }
+        }
+        requestAnimationFrame(drawFrame);
+      }
+      requestAnimationFrame(drawFrame);
     }
 
     // Starts full pipeline
@@ -599,15 +683,19 @@
       setTimeout(() => {
         progressBar.style.width = '60%';
         statusLabel.innerText = "Measuring joint angles and checking depth...";
-      }, 3000);
+      }, 2500);
 
       setTimeout(() => {
         progressBar.style.width = '85%';
         statusLabel.innerText = "Generating your personalized coach feedback...";
-      }, 7000);
+      }, 5500);
 
       try {
-        const res = await fetch('/api/analyze', { method: 'POST', body: formData });
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s safety timeout
+
+        const res = await fetch('/api/analyze', { method: 'POST', body: formData, signal: controller.signal });
+        clearTimeout(timeoutId);
         const text = await res.text();
         let json;
         try {
@@ -617,17 +705,19 @@
         }
 
         if (json.success) {
+          skeletonKeypoints = json.data?.keypoints || [];
           progressBar.style.width = '100%';
           setTimeout(() => {
             renderDashboard(json.data, json.video_url, json.original_video_url);
             goToScreen('screen-overview');
-          }, 600);
+            initSkeletonCanvasRenderer();
+          }, 400);
         } else {
           alert("Analysis error: " + (json.error || "Unknown error"));
           goToScreen('screen-upload');
         }
       } catch (err) {
-        alert("Notice: " + err.message);
+        alert("Notice: " + (err.name === 'AbortError' ? 'Upload timed out. Please try a shorter 5-15s video.' : err.message));
         goToScreen('screen-upload');
       }
     }
@@ -653,8 +743,10 @@
       const vbt = data.automotive_telemetry?.velocity_telematics;
       document.getElementById('stat-fatigue').innerText = vbt?.fatigue_detected ? "Fatigued" : "Normal";
 
-      // Set video to analyzed video initially
-      switchVideoView('annotated');
+      // Set video to user's uploaded video
+      const v = document.getElementById('result-video');
+      v.src = currentOriginalVideoUrl;
+      v.play().catch(() => {});
 
       // 2. Coach Screen
       const coachMd = data.rag_coaching?.coach_report_markdown || "No coaching feedback available.";

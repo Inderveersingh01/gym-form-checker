@@ -60,7 +60,7 @@ class GymFormCheckerPipeline:
         self,
         video_path: str,
         exercise_override: Optional[str] = None,
-        generate_video: bool = True,
+        generate_video: bool = False,
         output_json_path: Optional[str] = None,
         user_name: str = "Athlete"
     ) -> Dict[str, Any]:
@@ -200,6 +200,7 @@ class GymFormCheckerPipeline:
                 "retrieved_protocols": coach_output.get("rag_protocols"),
                 "coach_report_markdown": coach_output.get("coaching_report"),
             },
+            "keypoints": frames_keypoints,
         }
 
         # Save output JSON
