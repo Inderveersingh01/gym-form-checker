@@ -4,8 +4,9 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import json
 import sys
+import gc
 
-def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_every_n_frames=2):
+def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_every_n_frames=3):
     base_options = python.BaseOptions(model_asset_path=model_path)
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
@@ -61,6 +62,7 @@ def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_ever
 
     cap.release()
     landmarker.close()
+    gc.collect()
     return results_per_frame
 
 if __name__ == "__main__":

@@ -1,11 +1,15 @@
 import json
 import os
 import sys
-from flask import Flask, render_template, request, jsonify, send_file, Response
+import gc
+import torch
+
+torch.set_num_threads(1)
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
+from flask import Flask, render_template, request, jsonify, send_file, Response
 from pipeline import GymFormCheckerPipeline
 
 app = Flask(__name__)
