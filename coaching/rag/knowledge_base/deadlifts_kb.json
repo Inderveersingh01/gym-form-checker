@@ -1,0 +1,80 @@
+[
+  {
+    "fault_code": "EARLY_HIP_RISE",
+    "fault_name": "Early Hip Rise (Stripper Pull)",
+    "exercise": "deadlift",
+    "source": "Starting Strength (Mark Rippetoe) / Calgary Barbell",
+    "biomechanical_root_cause": "Hips shooting up prematurely before the barbell passes the knees. Caused by either starting with the hips positioned too low (squatting the deadlift), weak quadriceps unable to initiate the knee extension push off the floor, or the bar starting too far forward of midfoot.",
+    "verbal_cues": [
+      "Leg press the floor away from you on the initial pull.",
+      "Chest and hips must rise at the exact same angle until the bar clears the knees.",
+      "Keep the weight centered over the middle of your foot."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Paused Deadlifts (1-inch off floor)",
+        "prescription": "3-4 sets x 3 reps @ 65% 1RM",
+        "coaching_points": "Break the bar off the floor, pause 2 seconds 1 inch up while holding torso angle constant, then drive through to lockout. Builds position-specific quad endurance."
+      },
+      {
+        "drill": "Deficit Deadlifts (1-2 inch platform)",
+        "prescription": "3 sets x 5 reps",
+        "coaching_points": "Increases knee flexion at setup, forcing stronger leg drive off the floor."
+      }
+    ]
+  },
+  {
+    "fault_code": "SQUATTING_THE_DEADLIFT",
+    "fault_name": "Hips Too Low at Setup",
+    "exercise": "deadlift",
+    "source": "NSCA Essentials of Strength & Conditioning",
+    "biomechanical_root_cause": "Dropping hips below knee level before pulling, pushing the shins forward and knocking the barbell away from the midfoot center of gravity.",
+    "verbal_cues": [
+      "Deadlift is a hinge, not a squat. Set hips high between knees and shoulders.",
+      "Bring shins to the bar without dropping your hips lower."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Romanian Deadlifts (RDL)",
+        "prescription": "3 sets x 8 reps",
+        "coaching_points": "Teaches the pure hip-hinge pattern while keeping knees soft and hips high."
+      }
+    ]
+  },
+  {
+    "fault_code": "LUMBAR_HYPEREXTENSION",
+    "fault_name": "Excessive Lumbar Hyperextension at Lockout",
+    "exercise": "deadlift",
+    "source": "Dr. Stuart McGill (Low Back Disorders)",
+    "biomechanical_root_cause": "Leaning the upper torso backward at the top of the deadlift rather than driving the hips forward into terminal extension. Places high compressive and shear stress on the lumbar facet joints and discs.",
+    "verbal_cues": [
+      "Stand straight up like a soldier; do not lean back.",
+      "Squeeze your glutes to finish the pull, not your lower back."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Tall Kneeling Cable Hip Extensions",
+        "prescription": "3 sets x 12 reps",
+        "coaching_points": "Locks the pelvis in neutral and isolates glute extension without permitting spinal arching."
+      }
+    ]
+  },
+  {
+    "fault_code": "BAR_DRIFT",
+    "fault_name": "Bar Drift Away from Body",
+    "exercise": "deadlift",
+    "source": "Juggernaut Training Systems",
+    "biomechanical_root_cause": "Failure to engage the latissimus dorsi to pull the bar into the body, increasing the moment arm between the barbell and the lumbar spine.",
+    "verbal_cues": [
+      "Protect your armpits: imagine holding an orange under each armpit and squeezing the juice out.",
+      "Paint your shins and thighs with the barbell."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Band-Resisted Deadlifts (Band pulling bar forward)",
+        "prescription": "3 sets x 5 reps",
+        "coaching_points": "Anchor a light resistance band to a rack in front of the bar. Forces active lat engagement to keep the bar against the legs."
+      }
+    ]
+  }
+]

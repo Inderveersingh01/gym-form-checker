@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KinematicAI - Smart Gym Form Checker</title>
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .screen { display: none; }
+    .screen.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen flex flex-col antialiased selection:bg-emerald-500 selection:text-black">
+
+  <!-- Top Global Navbar -->
+  <header class="border-b border-zinc-800/80 bg-zinc-900/60 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="goToScreen('screen-upload')">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center text-zinc-950 font-extrabold text-lg shadow-lg shadow-emerald-500/20">
+          <i class="fa-solid fa-dumbbell text-zinc-950"></i>
+        </div>
+        <div>
+          <span class="font-bold text-lg tracking-tight text-white">Form<span class="text-emerald-400">Checker</span></span>
+          <span class="text-xs text-zinc-400 block -mt-1 font-medium">Smart Workout Assistant</span>
+        </div>
+      </div>
+
+      <!-- Action -->
+      <div class="flex items-center space-x-3">
+        <button onclick="goToScreen('screen-upload')" class="text-xs font-semibold px-3.5 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 transition flex items-center space-x-2 border border-zinc-700">
+          <i class="fa-solid fa-plus"></i>
+          <span>Check New Video</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 1: UPLOAD & VIDEO PREVIEW -->
+    <!-- ========================================================================= -->
+    <section id="screen-upload" class="screen active">
+      <div class="max-w-3xl mx-auto space-y-8">
+        
+        <!-- Friendly Header -->
+        <div class="text-center space-y-2">
+          <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">
+            Check Your Workout Form
+          </h1>
+          <p class="text-zinc-400 text-sm sm:text-base">
+            Upload your exercise video. Get immediate feedback on depth, posture, balance, and personalized tips from an AI coach.
+          </p>
+        </div>
+
+        <!-- Step 1: Simple Exercise Selector -->
+        <div class="space-y-3">
+          <label class="block text-xs font-bold tracking-wider uppercase text-zinc-400">Step 1: Choose Your Exercise</label>
+          <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            
+            <div class="exercise-card cursor-pointer p-3.5 rounded-xl border border-emerald-500 bg-emerald-500/10 transition flex flex-col items-center text-center space-y-2" onclick="selectExercise('auto', this)">
+              <div class="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+              </div>
+              <span class="text-xs font-bold text-white">Auto-Detect</span>
+              <span class="text-[10px] text-zinc-400">Detect for me</span>
+            </div>
+
+            <div class="exercise-card cursor-pointer p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition flex flex-col items-center text-center space-y-2" onclick="selectExercise('squat', this)">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                <i class="fa-solid fa-person-arrow-down-to-line text-sm"></i>
+              </div>
+              <span class="text-xs font-bold text-white">Squat</span>
+              <span class="text-[10px] text-zinc-400">Depth & Knees</span>
+            </div>
+
+            <div class="exercise-card cursor-pointer p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition flex flex-col items-center text-center space-y-2" onclick="selectExercise('deadlift', this)">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                <i class="fa-solid fa-person-arrow-up-from-line text-sm"></i>
+              </div>
+              <span class="text-xs font-bold text-white">Deadlift</span>
+              <span class="text-[10px] text-zinc-400">Back & Hips</span>
+            </div>
+
+            <div class="exercise-card cursor-pointer p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition flex flex-col items-center text-center space-y-2" onclick="selectExercise('bench_press', this)">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                <i class="fa-solid fa-bed text-sm"></i>
+              </div>
+              <span class="text-xs font-bold text-white">Bench Press</span>
+              <span class="text-[10px] text-zinc-400">Elbows & Chest</span>
+            </div>
+
+            <div class="exercise-card cursor-pointer p-3.5 rounded-xl border border-zinc-800 bg-zinc-900/50 hover:border-zinc-700 transition flex flex-col items-center text-center space-y-2" onclick="selectExercise('overhead_press', this)">
+              <div class="w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center text-zinc-300">
+                <i class="fa-solid fa-arrows-up-to-line text-sm"></i>
+              </div>
+              <span class="text-xs font-bold text-white">Overhead Press</span>
+              <span class="text-[10px] text-zinc-400">Lockout & Core</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Step 2: Upload Video Box -->
+        <div class="space-y-3">
+          <label class="block text-xs font-bold tracking-wider uppercase text-zinc-400">Step 2: Upload Your Workout Video</label>
+          <div id="drop-zone" class="border-2 border-dashed border-zinc-800 hover:border-emerald-500/50 rounded-2xl p-8 text-center bg-zinc-900/40 transition flex flex-col items-center justify-center space-y-3 cursor-pointer" onclick="document.getElementById('video-input').click()">
+            <input type="file" id="video-input" accept="video/*" class="hidden" onchange="handleFileSelected(this.files)">
+            <div class="w-14 h-14 rounded-2xl bg-zinc-800/80 flex items-center justify-center text-emerald-400 text-2xl shadow-inner">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+            </div>
+            <div>
+              <p class="font-semibold text-sm text-zinc-200" id="file-label">Click here to choose your video file</p>
+              <p class="text-xs text-zinc-500 mt-1">Supports MP4, MOV, or any phone recording (Side view works best)</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Immediate Video Preview Container (Appears after uploading) -->
+        <div id="preview-container" class="hidden bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-emerald-400 flex items-center space-x-2">
+              <i class="fa-solid fa-circle-check"></i>
+              <span>Your Video Preview (Ready to analyze)</span>
+            </span>
+            <button onclick="document.getElementById('video-input').click()" class="text-xs text-zinc-400 hover:text-white underline">Change Video</button>
+          </div>
+          <div class="aspect-video bg-black rounded-xl overflow-hidden border border-zinc-800 relative">
+            <video id="preview-video" controls class="w-full h-full object-contain"></video>
+          </div>
+        </div>
+
+        <!-- Start Analysis Button -->
+        <div>
+          <button id="btn-analyze" onclick="startAnalysis()" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 font-bold text-zinc-950 shadow-lg shadow-emerald-500/20 transition flex items-center justify-center space-x-2 text-sm">
+            <i class="fa-solid fa-play"></i>
+            <span>Analyze My Form</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 2: FRIENDLY LOADING SCREEN -->
+    <!-- ========================================================================= -->
+    <section id="screen-analyzing" class="screen">
+      <div class="max-w-md mx-auto py-16 text-center space-y-6">
+        
+        <div class="relative w-20 h-20 mx-auto flex items-center justify-center">
+          <div class="absolute inset-0 rounded-full border-2 border-emerald-500/30 animate-ping"></div>
+          <div class="w-14 h-14 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center text-emerald-400 text-xl shadow-xl">
+            <i class="fa-solid fa-dumbbell animate-spin"></i>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+          <h2 class="text-xl font-bold text-white">Analyzing Your Form...</h2>
+          <p class="text-xs text-zinc-400" id="loading-status">Tracking joints and calculating rep metrics...</p>
+        </div>
+
+        <!-- Simple Progress Bar -->
+        <div class="w-full bg-zinc-900 h-2 rounded-full overflow-hidden border border-zinc-800">
+          <div id="progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-1/3 transition-all duration-500 rounded-full"></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 3: RESULTS MAIN OVERVIEW DASHBOARD -->
+    <!-- ========================================================================= -->
+    <section id="screen-overview" class="screen">
+      <div class="space-y-6">
+
+        <!-- Top Overview Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800">
+          <div class="flex items-center space-x-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-500 flex flex-col items-center justify-center text-zinc-950 font-black shadow-lg shadow-emerald-500/20">
+              <span class="text-2xl leading-none" id="hero-score">87</span>
+              <span class="text-[9px] uppercase tracking-wider font-extrabold">Score</span>
+            </div>
+            <div>
+              <div class="flex items-center space-x-2">
+                <h2 class="text-2xl font-bold text-white uppercase" id="hero-exercise">SQUAT</h2>
+                <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" id="hero-status-badge">Completed</span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-1" id="hero-verdict">5 reps completed with solid depth</p>
+            </div>
+          </div>
+          <button onclick="goToScreen('screen-upload')" class="px-4 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold transition flex items-center space-x-2 self-start sm:self-auto border border-zinc-700">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Upload Another Video</span>
+          </button>
+        </div>
+
+        <!-- Video Player & Metric Cards Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Left: Video Player with Toggle for Original vs Annotated (6 Cols) -->
+          <div class="lg:col-span-6 bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden p-4 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold tracking-wider uppercase text-zinc-400 flex items-center space-x-2">
+                <i class="fa-solid fa-circle-play text-emerald-400"></i>
+                <span id="video-title-label">Analyzed Video (With Angles)</span>
+              </span>
+              
+              <!-- Video Toggle Button -->
+              <div class="flex bg-zinc-950 p-1 rounded-lg border border-zinc-800">
+                <button id="btn-view-annotated" onclick="switchVideoView('annotated')" class="px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition">
+                  Analyzed
+                </button>
+                <button id="btn-view-original" onclick="switchVideoView('original')" class="px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-400 hover:text-white transition">
+                  Original
+                </button>
+              </div>
+            </div>
+
+            <div class="aspect-video bg-black rounded-xl overflow-hidden border border-zinc-800 relative">
+              <video id="result-video" controls class="w-full h-full object-contain"></video>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 text-center pt-1">
+              <div class="bg-zinc-950 p-2 rounded-lg border border-zinc-800/80">
+                <span class="text-[10px] text-zinc-500 block uppercase font-medium">Total Reps</span>
+                <span class="text-base font-bold text-white" id="stat-total-reps">5</span>
+              </div>
+              <div class="bg-zinc-950 p-2 rounded-lg border border-zinc-800/80">
+                <span class="text-[10px] text-zinc-500 block uppercase font-medium">Avg Speed</span>
+                <span class="text-base font-bold text-white" id="stat-avg-tempo">3.7s</span>
+              </div>
+              <div class="bg-zinc-950 p-2 rounded-lg border border-zinc-800/80">
+                <span class="text-[10px] text-zinc-500 block uppercase font-medium">Fatigue Level</span>
+                <span class="text-base font-bold text-emerald-400" id="stat-fatigue">Normal</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: The 4 Simple Navigation Cards (6 Cols) -->
+          <div class="lg:col-span-6 space-y-3">
+            <p class="text-xs font-bold tracking-wider uppercase text-zinc-400 mb-2">
+              Select an option below to view details:
+            </p>
+
+            <!-- Card 1: Personal AI Coach -->
+            <div onclick="goToScreen('screen-coach')" class="cursor-pointer p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition group flex items-center justify-between shadow-sm">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xl group-hover:scale-105 transition">
+                  <i class="fa-solid fa-comment-dots"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-emerald-400 transition">Personal AI Coach</h3>
+                  <p class="text-xs text-zinc-400 mt-0.5">Personalized advice, focus cues for your next set, and warm-up drills.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-zinc-600 group-hover:text-emerald-400 group-hover:translate-x-1 transition"></i>
+            </div>
+
+            <!-- Card 2: Rep-by-Rep Breakdown -->
+            <div onclick="goToScreen('screen-kinematics')" class="cursor-pointer p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 hover:border-cyan-500/50 transition group flex items-center justify-between shadow-sm">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xl group-hover:scale-105 transition">
+                  <i class="fa-solid fa-list-check"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-cyan-400 transition">Rep-by-Rep Breakdown</h3>
+                  <p class="text-xs text-zinc-400 mt-0.5">See depth status, angles, and speed for every single repetition.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-zinc-600 group-hover:text-cyan-400 group-hover:translate-x-1 transition"></i>
+            </div>
+
+            <!-- Card 3: Balance & Bar Path -->
+            <div onclick="goToScreen('screen-automotive')" class="cursor-pointer p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 transition group flex items-center justify-between shadow-sm">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl group-hover:scale-105 transition">
+                  <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-amber-400 transition">Balance & Bar Path</h3>
+                  <p class="text-xs text-zinc-400 mt-0.5">Check if your weight shifted forward or backward and monitor fatigue.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-zinc-600 group-hover:text-amber-400 group-hover:translate-x-1 transition"></i>
+            </div>
+
+            <!-- Card 4: Form Quality & Rating -->
+            <div onclick="goToScreen('screen-ml')" class="cursor-pointer p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 hover:border-purple-500/50 transition group flex items-center justify-between shadow-sm">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center text-purple-400 text-xl group-hover:scale-105 transition">
+                  <i class="fa-solid fa-award"></i>
+                </div>
+                <div>
+                  <h3 class="font-bold text-white text-sm group-hover:text-purple-400 transition">Form Quality & Rating</h3>
+                  <p class="text-xs text-zinc-400 mt-0.5">See your execution rating and the top factors that affected your score.</p>
+                </div>
+              </div>
+              <i class="fa-solid fa-chevron-right text-zinc-600 group-hover:text-purple-400 group-hover:translate-x-1 transition"></i>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 4A: DEDICATED AI COACH SCREEN -->
+    <!-- ========================================================================= -->
+    <section id="screen-coach" class="screen">
+      <div class="max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+          <div class="flex items-center space-x-3">
+            <button onclick="goToScreen('screen-overview')" class="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300 transition">
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-comment-dots text-emerald-400"></i>
+                <span>Personal AI Coach Advice</span>
+              </h2>
+              <p class="text-xs text-zinc-400">Evidence-based corrections based on your workout</p>
+            </div>
+          </div>
+          <button onclick="goToScreen('screen-overview')" class="text-xs text-zinc-400 hover:text-white transition">Back to Dashboard &rarr;</button>
+        </div>
+
+        <!-- Coach Content Box -->
+        <div class="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 sm:p-8 space-y-6">
+          <div id="coach-report-content" class="text-sm leading-relaxed text-zinc-300 space-y-4 whitespace-pre-line font-normal">
+            <!-- Populated via JS -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 4B: DEDICATED REP BREAKDOWN SCREEN -->
+    <!-- ========================================================================= -->
+    <section id="screen-kinematics" class="screen">
+      <div class="max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+          <div class="flex items-center space-x-3">
+            <button onclick="goToScreen('screen-overview')" class="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300 transition">
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-list-check text-cyan-400"></i>
+                <span>Rep-by-Rep Breakdown</span>
+              </h2>
+              <p class="text-xs text-zinc-400">Exact angles, depths, and speed measured for each repetition</p>
+            </div>
+          </div>
+          <button onclick="goToScreen('screen-overview')" class="text-xs text-zinc-400 hover:text-white transition">Back to Dashboard &rarr;</button>
+        </div>
+
+        <!-- Table -->
+        <div class="bg-zinc-900/60 border border-zinc-800 rounded-2xl overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-zinc-950/80 text-zinc-400 border-b border-zinc-800 uppercase font-semibold">
+                <tr>
+                  <th class="py-3.5 px-4">Rep</th>
+                  <th class="py-3.5 px-4">Depth</th>
+                  <th class="py-3.5 px-4">Knee Angle</th>
+                  <th class="py-3.5 px-4">Torso Lean</th>
+                  <th class="py-3.5 px-4">Lockout</th>
+                  <th class="py-3.5 px-4">Speed (Down / Up)</th>
+                  <th class="py-3.5 px-4">Result</th>
+                </tr>
+              </thead>
+              <tbody id="kinematic-table-body" class="divide-y divide-zinc-800/60 text-zinc-200">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 4C: DEDICATED BALANCE & BAR PATH SCREEN -->
+    <!-- ========================================================================= -->
+    <section id="screen-automotive" class="screen">
+      <div class="max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+          <div class="flex items-center space-x-3">
+            <button onclick="goToScreen('screen-overview')" class="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300 transition">
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-scale-balanced text-amber-400"></i>
+                <span>Balance & Bar Path</span>
+              </h2>
+              <p class="text-xs text-zinc-400">Tracking weight balance over your feet and muscle fatigue across reps</p>
+            </div>
+          </div>
+          <button onclick="goToScreen('screen-overview')" class="text-xs text-zinc-400 hover:text-white transition">Back to Dashboard &rarr;</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          
+          <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-wave-square"></i>
+            </div>
+            <h4 class="font-bold text-white text-sm">Movement Smoothness</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Trajectory filter smoothed camera motion and calculated continuous movement speed.
+            </p>
+            <div class="pt-2 text-xs font-mono text-emerald-400 font-bold" id="auto-kalman-frames">320 frames analyzed</div>
+          </div>
+
+          <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-arrows-left-right"></i>
+            </div>
+            <h4 class="font-bold text-white text-sm">Bar Path Drift</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Monitors whether the bar shifted forward or backward away from midfoot balance.
+            </p>
+            <div class="pt-2 text-xs font-mono text-amber-400 font-bold" id="auto-ldw-events">5 minor forward shifts</div>
+          </div>
+
+          <div class="bg-zinc-900/60 border border-zinc-800 p-5 rounded-2xl space-y-2">
+            <div class="w-8 h-8 rounded-lg bg-teal-500/10 text-teal-400 flex items-center justify-center text-sm">
+              <i class="fa-solid fa-battery-half"></i>
+            </div>
+            <h4 class="font-bold text-white text-sm">Rep Fatigue Tracking</h4>
+            <p class="text-xs text-zinc-400 leading-relaxed">
+              Compares the speed of your first rep against your final rep to check fatigue.
+            </p>
+            <div class="pt-2 text-xs font-mono text-emerald-400 font-bold" id="auto-vbt-status">Stable speed (No major drop)</div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- SCREEN 4D: DEDICATED FORM QUALITY & RATING SCREEN -->
+    <!-- ========================================================================= -->
+    <section id="screen-ml" class="screen">
+      <div class="max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex items-center justify-between border-b border-zinc-800 pb-4">
+          <div class="flex items-center space-x-3">
+            <button onclick="goToScreen('screen-overview')" class="w-9 h-9 rounded-xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center text-zinc-300 transition">
+              <i class="fa-solid fa-arrow-left text-sm"></i>
+            </button>
+            <div>
+              <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+                <i class="fa-solid fa-award text-purple-400"></i>
+                <span>Form Quality & Rating</span>
+              </h2>
+              <p class="text-xs text-zinc-400">Overall execution rating and what drove your score</p>
+            </div>
+          </div>
+          <button onclick="goToScreen('screen-overview')" class="text-xs text-zinc-400 hover:text-white transition">Back to Dashboard &rarr;</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Movement Classification Card -->
+          <div class="bg-zinc-900/60 border border-zinc-800 p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-white text-sm">Movement Identified</h3>
+              <span class="text-[10px] text-purple-400 font-mono font-bold" id="movement-confidence-tag">96.5% Match</span>
+            </div>
+            <p class="text-xs text-zinc-400">How closely your movement pattern matched standard exercises:</p>
+            <div class="space-y-3" id="cnn-probs-container">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+          <!-- Key Scoring Factors Card -->
+          <div class="bg-zinc-900/60 border border-zinc-800 p-6 rounded-2xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h3 class="font-bold text-white text-sm">Top Factors Influencing Your Score</h3>
+              <span class="text-[10px] text-emerald-400 font-mono font-bold">Priority Order</span>
+            </div>
+            <p class="text-xs text-zinc-400">Which parts of your movement had the biggest impact on your score:</p>
+            <div class="space-y-3" id="rf-importance-container">
+              <!-- Populated via JS -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JavaScript Navigation & State -->
+  <script>
+    let selectedExercise = "auto";
+    let selectedFile = null;
+    let globalAnalysisData = null;
+    let currentAnnotatedVideoUrl = "";
+    let currentOriginalVideoUrl = "";
+
+    function goToScreen(screenId) {
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      const target = document.getElementById(screenId);
+      if (target) {
+        target.classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    function selectExercise(ex, cardEl) {
+      selectedExercise = ex;
+      document.querySelectorAll('.exercise-card').forEach(c => {
+        c.classList.remove('border-emerald-500', 'bg-emerald-500/10');
+        c.classList.add('border-zinc-800', 'bg-zinc-900/50');
+      });
+      cardEl.classList.remove('border-zinc-800', 'bg-zinc-900/50');
+      cardEl.classList.add('border-emerald-500', 'bg-emerald-500/10');
+    }
+
+    // Handles user video selection and IMMEDIATELY plays the video preview!
+    function handleFileSelected(files) {
+      if (files && files[0]) {
+        selectedFile = files[0];
+        document.getElementById('file-label').innerHTML = `<span class="text-emerald-400 font-bold">${selectedFile.name}</span> selected (${(selectedFile.size / (1024*1024)).toFixed(1)} MB)`;
+        
+        // Show video preview immediately on upload screen
+        const previewVideo = document.getElementById('preview-video');
+        const objectUrl = URL.createObjectURL(selectedFile);
+        previewVideo.src = objectUrl;
+        document.getElementById('preview-container').classList.remove('hidden');
+        previewVideo.play().catch(() => {}); // Play or allow user controls
+      }
+    }
+
+    // Toggle between Annotated and Original Video
+    function switchVideoView(mode) {
+      const v = document.getElementById('result-video');
+      const titleLabel = document.getElementById('video-title-label');
+      const btnAnnotated = document.getElementById('btn-view-annotated');
+      const btnOriginal = document.getElementById('btn-view-original');
+
+      if (mode === 'annotated') {
+        v.src = currentAnnotatedVideoUrl;
+        titleLabel.innerText = "Analyzed Video (With Angles)";
+        btnAnnotated.className = "px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition";
+        btnOriginal.className = "px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-400 hover:text-white transition";
+      } else {
+        v.src = currentOriginalVideoUrl;
+        titleLabel.innerText = "Original Video (Your Upload)";
+        btnOriginal.className = "px-2.5 py-1 text-[10px] font-bold rounded-md bg-emerald-500 text-black transition";
+        btnAnnotated.className = "px-2.5 py-1 text-[10px] font-bold rounded-md text-zinc-400 hover:text-white transition";
+      }
+      v.play().catch(() => {});
+    }
+
+    // Starts full pipeline
+    async function startAnalysis() {
+      if (!selectedFile) {
+        alert("Please select a workout video first by clicking the upload area.");
+        return;
+      }
+
+      goToScreen('screen-analyzing');
+      const progressBar = document.getElementById('progress-bar');
+      const statusLabel = document.getElementById('loading-status');
+
+      progressBar.style.width = '25%';
+      statusLabel.innerText = "Detecting body joints across frames...";
+
+      const formData = new FormData();
+      formData.append('video', selectedFile);
+      formData.append('exercise', selectedExercise);
+
+      setTimeout(() => {
+        progressBar.style.width = '60%';
+        statusLabel.innerText = "Measuring joint angles and checking depth...";
+      }, 3000);
+
+      setTimeout(() => {
+        progressBar.style.width = '85%';
+        statusLabel.innerText = "Generating your personalized coach feedback...";
+      }, 7000);
+
+      try {
+        const res = await fetch('/api/analyze', { method: 'POST', body: formData });
+        const json = await res.json();
+        if (json.success) {
+          progressBar.style.width = '100%';
+          setTimeout(() => {
+            renderDashboard(json.data, json.video_url, json.original_video_url);
+            goToScreen('screen-overview');
+          }, 600);
+        } else {
+          alert("Analysis error: " + json.error);
+          goToScreen('screen-upload');
+        }
+      } catch (err) {
+        alert("Server error occurred during analysis.");
+        goToScreen('screen-upload');
+      }
+    }
+
+    // Populate all screens
+    function renderDashboard(data, videoUrl, originalVideoUrl) {
+      globalAnalysisData = data;
+      currentAnnotatedVideoUrl = videoUrl;
+      // If user uploaded a file in this session, use its local object URL or server URL
+      currentOriginalVideoUrl = selectedFile ? URL.createObjectURL(selectedFile) : (originalVideoUrl || "/video/squat1.mp4");
+
+      // 1. Overview Screen
+      const k = data.kinematics;
+      const meta = data.metadata;
+      document.getElementById('hero-score').innerText = Math.round(k.overall_score);
+      document.getElementById('hero-exercise').innerText = (meta.exercise || "SQUAT").replace('_', ' ');
+      document.getElementById('hero-verdict').innerText = `${k.successful_reps} of ${k.total_reps} Reps Completed • ${k.overall_score >= 80 ? 'Good execution with minor notes' : 'Needs corrective attention'}`;
+
+      document.getElementById('stat-total-reps').innerText = k.total_reps;
+      const avgTempo = k.summary_metrics?.avg_rep_duration_sec || 3.7;
+      document.getElementById('stat-avg-tempo').innerText = `${avgTempo}s`;
+
+      const vbt = data.automotive_telemetry?.velocity_telematics;
+      document.getElementById('stat-fatigue').innerText = vbt?.fatigue_detected ? "Fatigued" : "Normal";
+
+      // Set video to analyzed video initially
+      switchVideoView('annotated');
+
+      // 2. Coach Screen
+      const coachMd = data.rag_coaching?.coach_report_markdown || "No coaching feedback available.";
+      document.getElementById('coach-report-content').innerText = coachMd;
+
+      // 3. Rep Breakdown Table Screen
+      const tbody = document.getElementById('kinematic-table-body');
+      tbody.innerHTML = '';
+      k.reps.forEach(r => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-zinc-800/40 transition";
+        const depth = r.metrics.depth_status || (r.metrics.knee_angle_at_bottom <= 90 ? "DEEP" : "SHALLOW");
+        const kneeAng = r.metrics.knee_angle_at_bottom ? `${r.metrics.knee_angle_at_bottom.toFixed(1)}°` : '--';
+        const torsoAng = r.metrics.torso_lean_at_bottom ? `${r.metrics.torso_lean_at_bottom.toFixed(1)}°` : '--';
+        const lockAng = r.metrics.lockout_knee_angle ? `${r.metrics.lockout_knee_angle.toFixed(1)}°` : '--';
+        const tempo = `${r.eccentric_seconds.toFixed(1)}s / ${r.concentric_seconds.toFixed(1)}s`;
+
+        tr.innerHTML = `
+          <td class="py-3.5 px-4 font-bold text-white">Rep ${r.rep_number}</td>
+          <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${depth === 'DEEP' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${depth}</span></td>
+          <td class="py-3.5 px-4 font-medium">${kneeAng}</td>
+          <td class="py-3.5 px-4 font-medium">${torsoAng}</td>
+          <td class="py-3.5 px-4 font-medium">${lockAng}</td>
+          <td class="py-3.5 px-4 text-zinc-400 font-mono">${tempo}</td>
+          <td class="py-3.5 px-4"><span class="px-2 py-0.5 rounded text-[10px] font-bold ${r.passed ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30'}">${r.passed ? 'Pass' : 'Review'}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      // 4. Balance Screen
+      const auto = data.automotive_telemetry;
+      document.getElementById('auto-kalman-frames').innerText = `${auto.total_frames_analyzed || 320} frames analyzed`;
+      document.getElementById('auto-ldw-events').innerText = `${auto.lane_departure_events_count || 0} minor shifts`;
+      document.getElementById('auto-vbt-status').innerText = `${vbt?.velocity_loss_pct || 0}% drop • ${vbt?.fatigue_detected ? 'Fatigue alert' : 'Stable speed'}`;
+
+      // 5. Form Quality & Rating Screen
+      const cnnProbs = data.machine_learning["1d_cnn_recognition"]?.class_probabilities || { "squat": 0.97, "deadlift": 0.01, "bench_press": 0.01, "overhead_press": 0.01 };
+      const cnnConfidence = data.machine_learning["1d_cnn_recognition"]?.confidence_score || 0.96;
+      document.getElementById('movement-confidence-tag').innerText = `${(cnnConfidence * 100).toFixed(1)}% Match`;
+
+      const cnnContainer = document.getElementById('cnn-probs-container');
+      cnnContainer.innerHTML = '';
+      for (const [cls, prob] of Object.entries(cnnProbs)) {
+        const pct = (prob * 100).toFixed(1);
+        cnnContainer.innerHTML += `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-semibold">
+              <span class="uppercase text-zinc-300">${cls.replace('_', ' ')}</span>
+              <span class="text-purple-400 font-mono">${pct}%</span>
+            </div>
+            <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <div class="h-full bg-purple-500 rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }
+
+      const rfRanking = data.machine_learning["random_forest_scoring"]?.feature_importance_ranking || {
+        "depth_and_posture": 0.35,
+        "torso_angle": 0.28,
+        "tempo_control": 0.20,
+        "lockout": 0.17
+      };
+      const rfContainer = document.getElementById('rf-importance-container');
+      rfContainer.innerHTML = '';
+      for (const [feat, imp] of Object.entries(rfRanking)) {
+        const pct = (imp * 100).toFixed(1);
+        const cleanName = feat.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        rfContainer.innerHTML += `
+          <div class="space-y-1">
+            <div class="flex justify-between text-xs font-semibold">
+              <span class="text-zinc-300">${cleanName}</span>
+              <span class="text-emerald-400 font-mono">${pct}%</span>
+            </div>
+            <div class="w-full h-2 bg-zinc-800 rounded-full overflow-hidden">
+              <div class="h-full bg-emerald-500 rounded-full" style="width: ${pct}%"></div>
+            </div>
+          </div>
+        `;
+      }
+    }
+  </script>
+
+</body>
+</html>

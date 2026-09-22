@@ -1,0 +1,19 @@
+# Python virtual environment
+venv/
+env/
+__pycache__/
+*.pyc
+
+# Environment secrets
+.env
+
+# Large video and json outputs
+*.mp4
+!squat1.mp4
+*_annotated.mp4
+*_analysis.json
+*_keypoints.json
+
+# Local editor settings
+.vscode/
+.idea/

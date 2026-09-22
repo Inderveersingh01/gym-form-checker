@@ -1,0 +1,62 @@
+[
+  {
+    "fault_code": "EXCESSIVE_ELBOW_FLARE",
+    "fault_name": "Excessive Elbow Flare (> 75 degrees)",
+    "exercise": "bench_press",
+    "source": "NSCA / EliteFTS / Dave Tate",
+    "biomechanical_root_cause": "Upper arms flaring perpendicular to the torso (90 degrees). Causes severe subacromial impingement of the supraspinatus tendon and increases anterior glenohumeral joint shear stress.",
+    "verbal_cues": [
+      "Tuck your elbows to a 45-to-60 degree arrow shape relative to your torso.",
+      "Bend the bar across your palms to engage your lats.",
+      "Think about pulling the bar down to your sternum rather than letting it crash."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Band Pull-Aparts & Face Pulls",
+        "prescription": "3 sets x 15 reps (Warmup)",
+        "coaching_points": "Activates rear deltoids and rhomboids, stabilizing the scapular retraction required for safe pressing."
+      },
+      {
+        "drill": "Dumbbell Neutral-Grip Bench Press",
+        "prescription": "3 sets x 8-10 reps",
+        "coaching_points": "Natural hand orientation prevents excessive elbow flare and groove the proper tuck."
+      }
+    ]
+  },
+  {
+    "fault_code": "INCOMPLETE_ROM",
+    "fault_name": "Incomplete Range of Motion (Short of Chest)",
+    "exercise": "bench_press",
+    "source": "Starting Strength (Mark Rippetoe)",
+    "biomechanical_root_cause": "Cutting depth due to overload, lack of shoulder extension mobility, or anterior shoulder discomfort.",
+    "verbal_cues": [
+      "Touch your chest gently at the nipple line before driving back up.",
+      "Stay tight at the bottom; do not bounce."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Spoto Press (Pause 1 inch above chest)",
+        "prescription": "4 sets x 4 reps",
+        "coaching_points": "Builds tremendous reversal strength and spatial awareness right at the reversal point."
+      }
+    ]
+  },
+  {
+    "fault_code": "BOUNCING_BAR",
+    "fault_name": "Bouncing the Bar off Ribcage",
+    "exercise": "bench_press",
+    "source": "IPF Technical Rules",
+    "biomechanical_root_cause": "Using momentum and ribcage compression to cheat the concentric reversal instead of muscular force production.",
+    "verbal_cues": [
+      "Lower with control: two-second descent.",
+      "Touch your shirt, don't break your ribs."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "2-Second Paused Bench Press",
+        "prescription": "4 sets x 3 reps @ 70% 1RM",
+        "coaching_points": "Completely dissipates elastic strain energy, requiring pure voluntary contraction."
+      }
+    ]
+  }
+]

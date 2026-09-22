@@ -1,0 +1,44 @@
+[
+  {
+    "fault_code": "LUMBAR_HYPEREXTENSION",
+    "fault_name": "Excessive Lumbar Arching in Overhead Press",
+    "exercise": "overhead_press",
+    "source": "Starting Strength (Mark Rippetoe) / Stuart McGill",
+    "biomechanical_root_cause": "Leaning backward significantly to recruit upper pectorals to assist the deltoids. Occurs when anterior core (rectus abdominis) or gluteus maximus fail to maintain a neutral pelvic tilt under overhead load.",
+    "verbal_cues": [
+      "Squeeze your glutes rock-hard and pull your ribcage down toward your belt.",
+      "Push your head through the window once the bar clears your forehead.",
+      "Press the weight up, not yourself back."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Half-Kneeling Landmine Press",
+        "prescription": "3 sets x 8 reps per side",
+        "coaching_points": "Half-kneeling position prevents lumbar hyperextension by forcing hip extension on the down knee."
+      },
+      {
+        "drill": "Deadbugs / Hollow Body Holds",
+        "prescription": "3 sets x 30-45 seconds",
+        "coaching_points": "Strengthens the anterior core against axial extension forces."
+      }
+    ]
+  },
+  {
+    "fault_code": "INCOMPLETE_OVERHEAD_LOCKOUT",
+    "fault_name": "Soft Overhead Lockout",
+    "exercise": "overhead_press",
+    "source": "Olympic Weightlifting Manuals / Greg Everett",
+    "biomechanical_root_cause": "Triceps fatigue or restricted glenohumeral upward rotation preventing full terminal elbow extension.",
+    "verbal_cues": [
+      "Press the ceiling through the roof at the top.",
+      "Shrug your shoulders slightly upward at full extension to lock the joint."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Overhead Pin Presses from Forehead Height",
+        "prescription": "4 sets x 3 reps",
+        "coaching_points": "Overloads the lockout portion of the press to build triceps power and lockout confidence."
+      }
+    ]
+  }
+]

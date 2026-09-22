@@ -1,0 +1,87 @@
+[
+  {
+    "fault_code": "SHALLOW_DEPTH",
+    "fault_name": "Shallow Squat Depth",
+    "exercise": "squat",
+    "source": "NSCA Essentials of Strength Training & Conditioning / Squat University",
+    "biomechanical_root_cause": "Limited ankle dorsiflexion mobility preventing the knee from tracking over the toes, or tight adductor magnus and hip capsule restricting depth. Often exacerbated by a stance width that is too narrow for the lifter's hip socket anatomy.",
+    "verbal_cues": [
+      "Spread the floor apart with your feet to create space for your hips to sink.",
+      "Sit between your ankles, not back behind your heels.",
+      "Open your knees out in the direction of your toes as you descend."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Goblet Box Squats with 3-second Pause",
+        "prescription": "3 sets x 5 reps",
+        "coaching_points": "Hold a kettlebell or dumbbell at chest level. Pause at the bottom target height to build hip mobility and positional comfort in the hole."
+      },
+      {
+        "drill": "Banded Ankle Dorsiflexion Mobilization",
+        "prescription": "2 sets x 15 pulses per side",
+        "coaching_points": "Anchor a heavy resistance band low behind you and loop it across the talus bone of the front ankle. Lunge forward to drive knee over toe."
+      }
+    ]
+  },
+  {
+    "fault_code": "EXCESSIVE_FORWARD_LEAN",
+    "fault_name": "Excessive Forward Lean (Good Morning Squat)",
+    "exercise": "squat",
+    "source": "Starting Strength (Mark Rippetoe) / Juggernaut Training Systems",
+    "biomechanical_root_cause": "Quadriceps fatigue or relative weakness causes the lifter to shift the load backward onto the stronger posterior chain (hamstrings, glutes, spinal erectors). Can also stem from a collapsing thoracic spine and lack of lat engagement under the barbell.",
+    "verbal_cues": [
+      "Show the logo on your chest to the wall in front of you.",
+      "Drive your traps and upper back aggressively up into the bar out of the hole.",
+      "Keep your ribs pulled down and brace your core 360 degrees before descending."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Front Squats or Safety Squat Bar (SSB) Squats",
+        "prescription": "3-4 sets x 6 reps",
+        "coaching_points": "Forces an upright vertical torso; any excessive forward lean results in dropping the bar, immediately reinforcing upright posture and quad recruitment."
+      },
+      {
+        "drill": "Thoracic Extension over Foam Roller + Lat Pullovers",
+        "prescription": "2 sets x 10 extensions",
+        "coaching_points": "Mobilizes the thoracic spine to prevent mid-back rounding under heavy axial loads."
+      }
+    ]
+  },
+  {
+    "fault_code": "RAPID_DESCENT",
+    "fault_name": "Uncontrolled Descent (Dive-bombing)",
+    "exercise": "squat",
+    "source": "The Squat Bible (Dr. Aaron Horschig)",
+    "biomechanical_root_cause": "Relying on the passive stretch reflex and bounce at the bottom rather than active eccentric muscular tension. Increases shear stress across the patellar tendon and ACL.",
+    "verbal_cues": [
+      "Pull yourself down with your hip flexors under control; do not just fall.",
+      "Count two seconds on the way down: 'One-one-thousand, Two-one-thousand'.",
+      "Stay tight like a compressed spring at the bottom."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Tempo 3-1-1 Squats",
+        "prescription": "4 sets x 4 reps @ 60% 1RM",
+        "coaching_points": "3 seconds eccentric descent, 1 second pause in the hole, 1 second explosive ascent. Re-establishes neuromuscular motor control."
+      }
+    ]
+  },
+  {
+    "fault_code": "INCOMPLETE_LOCKOUT",
+    "fault_name": "Incomplete Lockout",
+    "exercise": "squat",
+    "source": "USAPL / IPF Powerlifting Technical Rules",
+    "biomechanical_root_cause": "Prematurely initiating the subsequent rep before achieving full knee and hip extension, or glute amnesia where the lifter fails to squeeze glutes at the top.",
+    "verbal_cues": [
+      "Stand tall and proud at the top of every rep.",
+      "Squeeze your glutes and lock your knees before starting the next rep."
+    ],
+    "corrective_drills": [
+      {
+        "drill": "Standing Glute Bridges / Banded Hip Extensions",
+        "prescription": "2 sets x 15 reps",
+        "coaching_points": "Focus on terminal hip extension without hyperextending the lumbar spine."
+      }
+    ]
+  }
+]
