@@ -16,7 +16,7 @@ class GroqCoachEngine:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model_name: str = "openai/gpt-oss-120b",
+        model_name: str = "openai/gpt-oss-20b",
         retriever: Optional[BiomechanicsRAGRetriever] = None,
     ):
         load_dotenv()
@@ -24,7 +24,7 @@ class GroqCoachEngine:
         if not self.api_key:
             raise ValueError("GROQ_API_KEY environment variable is missing. Please set it in .env file.")
 
-        self.client = Groq(api_key=self.api_key)
+        self.client = Groq(api_key=self.api_key, timeout=15.0)
         self.model_name = model_name
         self.retriever = retriever or BiomechanicsRAGRetriever()
 
