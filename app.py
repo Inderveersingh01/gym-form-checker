@@ -2,9 +2,6 @@ import json
 import os
 import sys
 import gc
-import torch
-
-torch.set_num_threads(1)
 
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
@@ -73,6 +70,8 @@ def analyze_video():
     except Exception as e:
         print(f"Pipeline error: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+    finally:
+        gc.collect()
 
 @app.route("/video/<filename>")
 def stream_video(filename):

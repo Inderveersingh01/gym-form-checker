@@ -6,7 +6,7 @@ import json
 import sys
 import gc
 
-def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_every_n_frames=3):
+def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_every_n_frames=3, max_frames=450):
     base_options = python.BaseOptions(model_asset_path=model_path)
     options = vision.PoseLandmarkerOptions(
         base_options=base_options,
@@ -24,7 +24,7 @@ def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_ever
 
     while cap.isOpened():
         ret, frame = cap.read()
-        if not ret:
+        if not ret or len(results_per_frame) >= max_frames:
             break
 
         if frame_idx % sample_every_n_frames == 0:

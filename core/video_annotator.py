@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import gc
 from typing import Any, Dict, List, Optional, Tuple
 from exercises.base import Kinematics, SetAnalysisResult
 
@@ -67,10 +68,14 @@ class VideoAnnotator:
         video_fps = cap.get(cv2.CAP_PROP_FPS) or self.fps
 
         needs_resize = False
-        if width > 720:
-            scale = 720.0 / width
-            width = 720
+        max_dim = max(width, height)
+        if max_dim > 640:
+            scale = 640.0 / max_dim
+            width = int(width * scale)
             height = int(height * scale)
+            # Ensure dimensions are even for video encoders
+            width = width - (width % 2)
+            height = height - (height % 2)
             needs_resize = True
 
         fourcc = cv2.VideoWriter_fourcc(*"mp4v")
@@ -233,4 +238,5 @@ class VideoAnnotator:
 
         cap.release()
         out.release()
+        gc.collect()
         return output_path
