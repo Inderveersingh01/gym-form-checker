@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: kinematicai-form-analyzer
+    runtime: docker
+    plan: free
+    envVars:
+      - key: PORT
+        value: 7860
+      - key: GROQ_API_KEY
+        sync: false
