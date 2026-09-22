@@ -72,7 +72,7 @@ class GymFormCheckerPipeline:
         cached_json = f"{base_name}_keypoints.json"
 
         print("\n" + "=" * 65)
-        print("  AI GYM FORM CHECKER & TELEMETRY COACH - MASTER PIPELINE")
+        print("  KINEMATICAI FORM ANALYZER - MASTER PIPELINE")
         print("=" * 65)
         print(f"Target Video: {video_path}")
 

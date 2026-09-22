@@ -86,7 +86,7 @@ def stream_video(filename):
 
 if __name__ == "__main__":
     print("\n" + "=" * 60)
-    print("🚀 FormAnalyzer Web Server Running!")
+    print("🚀 KinematicAI Form Analyzer Web Server Running!")
     print("👉 Open your browser at: http://127.0.0.1:5000")
     print("=" * 60 + "\n")
     app.run(host="127.0.0.1", port=5000, debug=False)
