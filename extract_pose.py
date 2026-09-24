@@ -43,6 +43,7 @@ def extract_keypoints(video_path, model_path="pose_landmarker.task", sample_ever
                 lm = result.pose_landmarks[0]
                 keypoints = {
                     "frame": frame_idx,
+                    "nose": {"x": lm[0].x, "y": lm[0].y, "vis": getattr(lm[0], "visibility", None)},
                     "left_hip": {"x": lm[23].x, "y": lm[23].y, "vis": getattr(lm[23], "visibility", None)},
                     "right_hip": {"x": lm[24].x, "y": lm[24].y, "vis": getattr(lm[24], "visibility", None)},
                     "left_knee": {"x": lm[25].x, "y": lm[25].y, "vis": getattr(lm[25], "visibility", None)},

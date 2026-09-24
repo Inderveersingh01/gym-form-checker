@@ -821,20 +821,39 @@
           }
 
           if (closest && minDiff <= 20) {
-            const w = canvas.width;
-            const h = canvas.height;
             const side = globalAnalysisData?.metadata?.dominant_camera_side || 'right';
 
-            const joints = ['shoulder', 'hip', 'knee', 'ankle', 'elbow', 'wrist'];
+            // Calculate actual video rect within the object-fit: contain container
+            const vW = v.videoWidth;
+            const vH = v.videoHeight;
+            const cW = canvas.width;
+            const cH = canvas.height;
+            
+            let scale = 1;
+            let offsetX = 0;
+            let offsetY = 0;
+            
+            if (vW > 0 && vH > 0) {
+              const scaleX = cW / vW;
+              const scaleY = cH / vH;
+              scale = Math.min(scaleX, scaleY);
+              const renderedW = vW * scale;
+              const renderedH = vH * scale;
+              offsetX = (cW - renderedW) / 2;
+              offsetY = (cH - renderedH) / 2;
+            }
+
+            const joints = ['nose', 'shoulder', 'hip', 'knee', 'ankle', 'elbow', 'wrist'];
             const coords = {};
             joints.forEach(j => {
               const pt = closest[`${side}_${j}`] || closest[j];
               if (pt && pt.x !== undefined && pt.y !== undefined) {
-                coords[j] = { x: pt.x * w, y: pt.y * h };
+                coords[j] = { x: pt.x * (vW * scale) + offsetX, y: pt.y * (vH * scale) + offsetY };
               }
             });
 
             const connections = [
+              ['nose', 'shoulder'],
               ['shoulder', 'hip'],
               ['hip', 'knee'],
               ['knee', 'ankle'],
