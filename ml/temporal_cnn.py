@@ -119,20 +119,40 @@ class ExerciseClassifierCNN:
         feature_matrix = self.extract_temporal_feature_matrix(frames, dominant_side=dominant_side)
         logits = self.model.forward(feature_matrix)
 
-        # Characteristic kinematic inductive priors:
-        # - Large hip vertical delta (hip_y range) indicates squat or deadlift
-        # - Wrists moving significantly above shoulders indicates overhead press
-        hip_y_range = float(feature_matrix[1].max() - feature_matrix[1].min())
-        wrist_y_mean = float(feature_matrix[9].mean())
+        # Characteristic kinematic inductive priors using biomechanical distinctions:
+        #
+        # Features available in feature_matrix (10 channels):
+        #   0=hip_x, 1=hip_y, 2=knee_x, 3=knee_y, 4=ankle_x, 5=ankle_y,
+        #   6=shoulder_x, 7=shoulder_y, 8=wrist_x, 9=wrist_y
+        #
+        # Key discriminating features:
+        #   SQUAT    - large KNEE range-of-motion, knee ROM ≈ hip ROM (both hinge deeply)
+        #   DEADLIFT - large HIP range-of-motion but small KNEE ROM (hip hinge, knee barely bends)
+        #   OHP      - wrists travel far above shoulders (wrist_y much lower than shoulder_y in image coords)
+        #   BENCH    - wrists move near chest level, small overall movement
+        hip_y_range    = float(feature_matrix[1].max() - feature_matrix[1].min())
+        knee_y_range   = float(feature_matrix[3].max() - feature_matrix[3].min())
+        wrist_y_mean   = float(feature_matrix[9].mean())
         shoulder_y_mean = float(feature_matrix[7].mean())
 
+        # Ratio: squats have high knee ROM relative to hip ROM.
+        # Deadlifts have much lower knee ROM relative to hip ROM (hip hinge dominant).
+        knee_to_hip_ratio = knee_y_range / max(hip_y_range, 0.01)
+
         prior_bias = np.zeros_like(logits)
-        if wrist_y_mean < shoulder_y_mean - 0.05:
-            prior_bias[3] += 3.0  # Overhead press (wrists above shoulders)
-        elif hip_y_range > 0.15:
-            prior_bias[0] += 4.5  # Squat (dominant hip vertical travel)
+        if wrist_y_mean < shoulder_y_mean - 0.08:
+            # Wrists clearly above shoulders → overhead press
+            prior_bias[3] += 4.0
+        elif hip_y_range > 0.10:
+            if knee_to_hip_ratio > 0.65:
+                # Both knee AND hip travel significantly → Squat
+                prior_bias[0] += 5.0
+            else:
+                # Large hip travel but small knee bend → Deadlift / Hip-hinge
+                prior_bias[1] += 5.0
         else:
-            prior_bias[1] += 2.0  # Deadlift / Pull
+            # Small overall movement — likely bench press
+            prior_bias[2] += 2.0
 
         adjusted_logits = logits + prior_bias
         exp_logits = np.exp(adjusted_logits - np.max(adjusted_logits))
