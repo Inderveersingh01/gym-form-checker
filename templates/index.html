@@ -979,9 +979,19 @@
       v.src = currentOriginalVideoUrl;
       v.play().catch(() => {});
 
-      // 2. Coach Screen
+      // 2. Coach Screen — convert markdown to clean HTML (remove ** bold, format headers)
       const coachMd = data.rag_coaching?.coach_report_markdown || "No coaching feedback available.";
-      document.getElementById('coach-report-content').innerText = coachMd;
+      const coachHtml = coachMd
+        .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')  // ***bold italic***
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')               // **bold**
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')                           // *italic*
+        .replace(/^#{3}\s+(.+)$/gm, '<h4 class="text-emerald-400 font-bold mt-4 mb-1">$1</h4>')
+        .replace(/^#{2}\s+(.+)$/gm, '<h3 class="text-emerald-400 font-bold text-base mt-5 mb-2">$1</h3>')
+        .replace(/^#{1}\s+(.+)$/gm, '<h2 class="text-emerald-400 font-bold text-lg mt-5 mb-2">$1</h2>')
+        .replace(/^[-•]\s+(.+)$/gm, '<li class="ml-4 list-disc">$1</li>')
+        .replace(/\n\n/g, '</p><p class="mb-2">')
+        .replace(/\n/g, '<br>');
+      document.getElementById('coach-report-content').innerHTML = '<p class="mb-2">' + coachHtml + '</p>';
 
       // 3. Rep Breakdown Table Screen
       const tbody = document.getElementById('kinematic-table-body');

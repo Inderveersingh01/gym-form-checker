@@ -143,12 +143,13 @@ class ExerciseClassifierCNN:
         if wrist_y_mean < shoulder_y_mean - 0.08:
             # Wrists clearly above shoulders → overhead press
             prior_bias[3] += 4.0
-        elif hip_y_range > 0.10:
-            if knee_to_hip_ratio > 0.65:
+        elif hip_y_range > 0.06:
+            if knee_to_hip_ratio > 0.45:
                 # Both knee AND hip travel significantly → Squat
-                prior_bias[0] += 5.0
+                # Lower threshold (0.45) catches more squat patterns
+                prior_bias[0] += 8.0
             else:
-                # Large hip travel but small knee bend → Deadlift / Hip-hinge
+                # Large hip travel but very small knee bend → Deadlift / Hip-hinge
                 prior_bias[1] += 5.0
         else:
             # Small overall movement — likely bench press
