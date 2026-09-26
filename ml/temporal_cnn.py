@@ -142,18 +142,18 @@ class ExerciseClassifierCNN:
         prior_bias = np.zeros_like(logits)
         if wrist_y_mean < shoulder_y_mean - 0.08:
             # Wrists clearly above shoulders → overhead press
-            prior_bias[3] += 4.0
+            prior_bias[3] += 5.0
         elif hip_y_range > 0.06:
-            if knee_to_hip_ratio > 0.45:
-                # Both knee AND hip travel significantly → Squat
-                # Lower threshold (0.45) catches more squat patterns
-                prior_bias[0] += 8.0
+            # Squat vs Deadlift biomechanical discriminator:
+            # - SQUAT: Knee flexion is deep, knee travels vertically > 58% of hip travel (ratio > 0.58)
+            # - DEADLIFT: Hip-hinge dominant movement. Knees bend slightly during floor pull (ratio typically 0.30 - 0.55)
+            if knee_to_hip_ratio > 0.58:
+                prior_bias[0] += 6.0  # Squat
             else:
-                # Large hip travel but very small knee bend → Deadlift / Hip-hinge
-                prior_bias[1] += 5.0
+                prior_bias[1] += 6.0  # Deadlift
         else:
             # Small overall movement — likely bench press
-            prior_bias[2] += 2.0
+            prior_bias[2] += 3.0
 
         adjusted_logits = logits + prior_bias
         exp_logits = np.exp(adjusted_logits - np.max(adjusted_logits))
